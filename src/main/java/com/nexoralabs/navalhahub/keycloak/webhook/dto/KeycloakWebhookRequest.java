@@ -16,6 +16,9 @@ public record KeycloakWebhookRequest(
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Details(
-            String username
+            String username,
+            String firstName,
+            String lastName,
+            String email
     ) {}
 }

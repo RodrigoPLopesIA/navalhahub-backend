@@ -22,7 +22,7 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @Column
@@ -36,14 +36,6 @@ public class User {
 
     @Column(name = "last_name")
     private String lastName;
-
-    @Column(
-            name = "keycloak_id",
-            nullable = false,
-            unique = true,
-            updatable = false
-    )
-    private String keycloakId;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @Builder.Default
