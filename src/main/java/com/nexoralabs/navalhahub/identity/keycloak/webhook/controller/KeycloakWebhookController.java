@@ -1,7 +1,7 @@
-package com.nexoralabs.navalhahub.keycloak.webhook.controller;
+package com.nexoralabs.navalhahub.identity.keycloak.webhook.controller;
 
-import com.nexoralabs.navalhahub.keycloak.webhook.dto.KeycloakWebhookRequest;
-import com.nexoralabs.navalhahub.keycloak.webhook.service.KeycloakWebhookService;
+import com.nexoralabs.navalhahub.identity.keycloak.webhook.dto.KeycloakWebhookRequest;
+import com.nexoralabs.navalhahub.identity.keycloak.webhook.service.KeycloakWebhookService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

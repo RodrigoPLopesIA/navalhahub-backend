@@ -1,7 +1,4 @@
 package com.nexoralabs.navalhahub.barbershop.entity;
-
-
-import com.nexoralabs.navalhahub.User.entity.User;
 import com.nexoralabs.navalhahub.barbershop.roles.BarbershopRole;
 
 import jakarta.persistence.*;
@@ -17,7 +14,7 @@ import java.util.Set;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_barbershop_member",
-                        columnNames = {"user_id", "barbershop_id"}
+                        columnNames = {"identity_id", "barbershop_id"}
                 )
         }
 )
@@ -32,9 +29,8 @@ public class BarbershopMember {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "identity_id", nullable = false)
+    private String identityID;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "barbershop_id", nullable = false)

@@ -1,14 +1,12 @@
-package com.nexoralabs.navalhahub.keycloak.webhook.service;
+package com.nexoralabs.navalhahub.identity.keycloak.webhook.service;
 
-import com.nexoralabs.navalhahub.User.entity.User;
-import com.nexoralabs.navalhahub.User.repository.UserRepository;
-import com.nexoralabs.navalhahub.keycloak.webhook.dto.KeycloakWebhookRequest;
+import com.nexoralabs.navalhahub.identity.keycloak.KeycloakIdentityProvider;
+import com.nexoralabs.navalhahub.identity.keycloak.webhook.dto.KeycloakWebhookRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -18,9 +16,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class KeycloakWebhookService {
 
-    private final UserRepository userRepository;
+    private final KeycloakIdentityProvider identityProvider;
 
-    @Transactional
     public void sync(KeycloakWebhookRequest request) {
 
         if (request.type() == null || request.type().isBlank()) {
@@ -46,30 +43,21 @@ public class KeycloakWebhookService {
             );
         }
 
-        UUID userId = UUID.fromString(request.userId().trim());
+        String keycloakUserId = request.userId().trim();
+
+        UUID identityId = identityProvider.ensureIdentityId(
+                keycloakUserId
+        );
 
         String username = request.details() != null
                 ? request.details().username()
                 : null;
 
-        if (userRepository.existsById(userId)) {
-            log.debug(
-                    "Usuário já sincronizado. Keycloak ID: {}",
-                    userId
-            );
-            return;
-        }
-
-        User user = User.builder()
-                .id(userId)
-                .username(username)
-                .build();
-
-        userRepository.save(user);
-
         log.info(
-                "Usuário sincronizado com sucesso. Keycloak ID: {}, Username: {}",
-                userId,
+                "Usuário verificado com sucesso. Event: {}, Keycloak ID: {}, Identity ID: {}, Username: {}",
+                eventType,
+                keycloakUserId,
+                identityId,
                 username
         );
     }

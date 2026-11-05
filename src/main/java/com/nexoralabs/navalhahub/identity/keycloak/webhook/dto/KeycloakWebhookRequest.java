@@ -1,4 +1,4 @@
-package com.nexoralabs.navalhahub.keycloak.webhook.dto;
+package com.nexoralabs.navalhahub.identity.keycloak.webhook.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
