@@ -80,10 +80,11 @@ public class KeycloakIdentityProvider extends IdentityProvider {
                 .create(user)) {
 
             if (response.getStatus() != Response.Status.CREATED.getStatusCode()) {
-                throw new IllegalStateException(
-                        "Erro ao criar usuário no Keycloak. HTTP: "
-                                + response.getStatus()
-                );
+                String errorBody = response.hasEntity()
+                        ? response.readEntity(String.class)
+                        : "Erro ao criar usuário no Keycloak.";
+
+                throw new IllegalStateException(errorBody);
             }
 
             return findUser(UUID.fromString(identityId));

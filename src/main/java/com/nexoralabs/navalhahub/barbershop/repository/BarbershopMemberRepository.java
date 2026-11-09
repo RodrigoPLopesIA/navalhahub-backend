@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface BarbershopMemberRepository
@@ -30,6 +31,15 @@ public interface BarbershopMemberRepository
 
     boolean existsByIdentityIDAndBarbershop_Id(
             String identityId,
+            String barbershopId
+    );
+
+    Optional<BarbershopMember> findByIdentityIDAndBarbershop_Id(
+            String identityID,
+            String barbershopId
+    );
+
+    List<BarbershopMember> findAllByBarbershop_IdAndActiveTrue(
             String barbershopId
     );
 }

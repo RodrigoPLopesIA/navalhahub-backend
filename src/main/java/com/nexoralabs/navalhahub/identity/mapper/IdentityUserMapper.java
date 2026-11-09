@@ -26,13 +26,12 @@ public class IdentityUserMapper {
 
         return new UserResponse(
                 response.identityId(),
-                response.username(),
-                null,
-                response.email(),
                 response.firstName(),
                 response.lastName(),
+                response.email(),
+                response.username(),
                 response.enabled(),
-               null
+            null
         );
     }
 }

@@ -1,7 +1,9 @@
 package com.nexoralabs.navalhahub.identity.dto;
 
-import java.util.UUID;
+import lombok.Builder;
 
+
+@Builder
 public record IdentityUserResponse(
         String identityId,
         String username,
