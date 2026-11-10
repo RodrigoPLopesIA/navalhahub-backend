@@ -31,7 +31,7 @@ public class IdentityUserMapper {
                 response.email(),
                 response.username(),
                 response.enabled(),
-            null
+                response.roles()
         );
     }
 }

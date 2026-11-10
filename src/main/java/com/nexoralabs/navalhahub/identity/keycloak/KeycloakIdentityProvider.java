@@ -112,7 +112,7 @@ public class KeycloakIdentityProvider extends IdentityProvider {
                 .users()
                 .get(existingUser.getId());
 
-        existingUser.setUsername(request.username());
+        
         existingUser.setEmail(request.email());
         existingUser.setFirstName(request.firstName());
         existingUser.setLastName(request.lastName());
@@ -191,7 +191,8 @@ public class KeycloakIdentityProvider extends IdentityProvider {
                 user.getEmail(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.isEnabled()
+                user.isEnabled(),
+                null
         );
     }
     public UUID ensureIdentityId(String keycloakUserId) {

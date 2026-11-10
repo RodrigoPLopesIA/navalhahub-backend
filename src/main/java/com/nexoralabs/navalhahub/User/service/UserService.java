@@ -7,6 +7,7 @@ import com.nexoralabs.navalhahub.barbershop.entity.Barbershop;
 import com.nexoralabs.navalhahub.barbershop.entity.BarbershopMember;
 import com.nexoralabs.navalhahub.barbershop.repository.BarbershopMemberRepository;
 import com.nexoralabs.navalhahub.barbershop.repository.BarbershopRepository;
+import com.nexoralabs.navalhahub.barbershop.roles.BarbershopRole;
 import com.nexoralabs.navalhahub.barbershop.util.RolesUtil;
 import com.nexoralabs.navalhahub.identity.dto.IdentityUserResponse;
 import com.nexoralabs.navalhahub.identity.mapper.IdentityUserMapper;
@@ -16,197 +17,175 @@ import com.nexoralabs.navalhahub.security.context.TenantContextHolder;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.List;
+import org.springframework.security.access.AccessDeniedException;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final IdentityService identityService;
-    private final IdentityUserMapper identityUserMapper;
+        private final IdentityService identityService;
+        private final IdentityUserMapper identityUserMapper;
 
-    private final BarbershopRepository barbershopRepository;
-    private final BarbershopMemberRepository memberRepository;
+        private final BarbershopRepository barbershopRepository;
+        private final BarbershopMemberRepository memberRepository;
 
-    @Transactional
-    public UserResponse createUser(
-            String barbershopId,
-            UserRequest userRequest
-    ) {
+        @Transactional
+        public UserResponse createUser(
+                        String barbershopId,
+                        UserRequest userRequest) {
 
-        var context =
-                TenantContextHolder.verifyBarberShopIdContext(barbershopId);
+                var context = TenantContextHolder.verifyBarberShopIdContext(barbershopId);
 
-        RolesUtil.validateRoleAssignment(
-                userRequest.role(),
-                context.roles()
-        );
+                RolesUtil.validateRoleAssignment(
+                                userRequest.role(),
+                                context.roles());
 
-        IdentityUserResponse identityResponse =
-                identityService.createUser(
-                        identityUserMapper.toIdentityUserRequest(userRequest)
-                );
+                IdentityUserResponse identityResponse = identityService.createUser(
+                                identityUserMapper.toIdentityUserRequest(userRequest));
 
-        try {
+                try {
 
-            Barbershop barbershop = barbershopRepository
-                    .findById(barbershopId)
-                    .orElseThrow(() ->
-                            new EntityNotFoundException(
-                                    "Barbershop not found"
-                            )
-                    );
+                        Barbershop barbershop = barbershopRepository
+                                        .findById(barbershopId)
+                                        .orElseThrow(() -> new EntityNotFoundException(
+                                                        "Barbershop not found"));
 
-            if (memberRepository.existsByIdentityIDAndBarbershop_Id(
-                    identityResponse.identityId(),
-                    barbershopId
-            )) {
-                throw new IllegalStateException(
-                        "User already belongs to this barbershop"
-                );
-            }
+                        if (memberRepository.existsByIdentityIDAndBarbershop_Id(
+                                        identityResponse.identityId(),
+                                        barbershopId)) {
+                                throw new IllegalStateException(
+                                                "User already belongs to this barbershop");
+                        }
 
-            BarbershopMember member = BarbershopMember.builder()
-                    .identityID(identityResponse.identityId())
-                    .barbershop(barbershop)
-                    .roles(new HashSet<>())
-                    .active(true)
-                    .build();
+                        BarbershopMember member = BarbershopMember.builder()
+                                        .identityID(identityResponse.identityId())
+                                        .barbershop(barbershop)
+                                        .roles(new HashSet<>())
+                                        .active(true)
+                                        .build();
 
-            member.getRoles().add(userRequest.role());
+                        member.getRoles().add(userRequest.role());
 
-            memberRepository.saveAndFlush(member);
+                        memberRepository.saveAndFlush(member);
 
-            return identityUserMapper.toUserResponse(identityResponse);
+                        return identityUserMapper.toUserResponse(identityResponse);
 
-        } catch (RuntimeException exception) {
+                } catch (RuntimeException exception) {
 
-            try {
-                identityService.deleteUser(
-                        UUID.fromString(identityResponse.identityId())
-                );
-            } catch (RuntimeException cleanupException) {
-                exception.addSuppressed(cleanupException);
-            }
+                        try {
+                                identityService.deleteUser(
+                                                UUID.fromString(identityResponse.identityId()));
+                        } catch (RuntimeException cleanupException) {
+                                exception.addSuppressed(cleanupException);
+                        }
 
-            throw exception;
+                        throw exception;
+                }
         }
-    }
 
-    @Transactional(readOnly = true)
-    public UserResponse findUser(
-            String barbershopId,
-            UUID identityId
-    ) {
+        @Transactional(readOnly = true)
+        public UserResponse findUser(
+                        String barbershopId,
+                        UUID identityId) {
 
-        TenantContextHolder.verifyBarberShopIdContext(barbershopId);
+                var context = TenantContextHolder.verifyBarberShopIdContext(barbershopId);
 
-        BarbershopMember member = findMembership(
-                barbershopId,
-                identityId
-        );
+                BarbershopMember member = findMembership(
+                                barbershopId,
+                                identityId);
+                boolean requesterIsManager = RolesUtil.isAdmin(context.roles()) || RolesUtil.isOwner(context.roles());
+                boolean targetIsManager = RolesUtil.isAdmin(member.getRoles()) || RolesUtil.isOwner(member.getRoles());
 
-        IdentityUserResponse identityResponse =
-                identityService.findUser(identityId);
+                if (!requesterIsManager && targetIsManager) {
+                        throw new AccessDeniedException(
+                                        "You cannot access ADMIN or OWNER profiles");
+                }
 
-        return identityUserMapper.toUserResponse(identityResponse);
-    }
+                IdentityUserResponse identityResponse = identityService.findUser(identityId);
 
-    @Transactional(readOnly = true)
-    public List<UserResponse> findAllUsers(String barbershopId) {
+                return identityUserMapper.toUserResponse(identityResponse).withRoles(member.getRoles());
+        }
 
-        TenantContextHolder.verifyBarberShopIdContext(barbershopId);
+        @Transactional(readOnly = true)
+        public Page<UserResponse> findAllUsers(String barbershopId, Pageable pageable) {
 
-        return memberRepository
-                .findAllByBarbershop_IdAndActiveTrue(barbershopId)
-                .stream()
-                .map(member -> {
-                    UUID identityId = UUID.fromString(
-                            member.getIdentityID()
-                    );
+                var context = TenantContextHolder.verifyBarberShopIdContext(barbershopId);
 
-                    IdentityUserResponse identityResponse =
-                            identityService.findUser(identityId);
+                return memberRepository
+                                .findAllByBarbershop_IdAndActiveTrue(barbershopId, pageable)
+                                .map(member -> {
+                                        UUID identityId = UUID.fromString(
+                                                        member.getIdentityID());
 
-                    return identityUserMapper.toUserResponse(
-                            identityResponse
-                    );
-                })
-                .toList();
-    }
+                                        IdentityUserResponse identityResponse = identityService.findUser(identityId);
 
-    @Transactional
-    public UserResponse updateUser(
-            String barbershopId,
-            UUID identityId,
-            UserRequest userRequest
-    ) {
+                                        return identityUserMapper.toUserResponse(
+                                                        identityResponse).withRoles(member.getRoles());
+                                });
 
-        var context =
+        }
+
+        @Transactional
+        public UserResponse updateUser(
+                        String barbershopId,
+                        UUID identityId,
+                        UserRequest userRequest) {
+
+                var context = TenantContextHolder.verifyBarberShopIdContext(barbershopId);
+
+                BarbershopMember member = findMembership(
+                                barbershopId,
+                                identityId);
+
+                RolesUtil.validateRoleAssignment(
+                                userRequest.role(),
+                                context.roles());
+
+                IdentityUserResponse identityResponse = identityService.updateUser(
+                                identityId,
+                                identityUserMapper.toIdentityUserRequest(userRequest));
+
+                member.getRoles().clear();
+                member.getRoles().add(userRequest.role());
+
+                memberRepository.save(member);
+
+                return identityUserMapper.toUserResponse(identityResponse).withRoles(member.getRoles());
+        }
+
+        @Transactional
+        public void deleteUser(
+                        String barbershopId,
+                        UUID identityId) {
+
                 TenantContextHolder.verifyBarberShopIdContext(barbershopId);
 
-        BarbershopMember member = findMembership(
-                barbershopId,
-                identityId
-        );
+                BarbershopMember member = findMembership(
+                                barbershopId,
+                                identityId);
 
-        RolesUtil.validateRoleAssignment(
-                userRequest.role(),
-                context.roles()
-        );
+                // Remove somente o vínculo com esta barbearia.
+                // A identidade global permanece no Keycloak.
 
-        IdentityUserResponse identityResponse =
-                identityService.updateUser(
-                        identityId,
-                        identityUserMapper.toIdentityUserRequest(userRequest)
-                );
+                memberRepository.delete(member);
+        }
 
-        member.getRoles().clear();
-        member.getRoles().add(userRequest.role());
+        private BarbershopMember findMembership(
+                        String barbershopId,
+                        UUID identityId) {
 
-        memberRepository.save(member);
-
-        return identityUserMapper.toUserResponse(identityResponse);
-    }
-
-    @Transactional
-    public void deleteUser(
-            String barbershopId,
-            UUID identityId
-    ) {
-
-        TenantContextHolder.verifyBarberShopIdContext(barbershopId);
-
-        BarbershopMember member = findMembership(
-                barbershopId,
-                identityId
-        );
-
-        // Remove somente o vínculo com esta barbearia.
-        // A identidade global permanece no Keycloak.
-
-        memberRepository.delete(member);
-    }
-
-    private BarbershopMember findMembership(
-            String barbershopId,
-            UUID identityId
-    ) {
-
-        return memberRepository
-                .findByIdentityIDAndBarbershop_Id(
-                        identityId.toString(),
-                        barbershopId
-                )
-                .orElseThrow(() ->
-                        new EntityNotFoundException(
-                                "User not found in this barbershop"
-                        )
-                );
-    }
+                return memberRepository
+                                .findByIdentityIDAndBarbershop_Id(
+                                                identityId.toString(),
+                                                barbershopId)
+                                .orElseThrow(() -> new EntityNotFoundException(
+                                                "User not found in this barbershop"));
+        }
 }

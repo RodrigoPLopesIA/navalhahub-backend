@@ -1,6 +1,8 @@
 package com.nexoralabs.navalhahub.barbershop.repository;
 
 import com.nexoralabs.navalhahub.barbershop.entity.BarbershopMember;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -39,7 +41,8 @@ public interface BarbershopMemberRepository
             String barbershopId
     );
 
-    List<BarbershopMember> findAllByBarbershop_IdAndActiveTrue(
-            String barbershopId
+    Page<BarbershopMember> findAllByBarbershop_IdAndActiveTrue(
+            String barbershopId,
+            Pageable pageable
     );
 }

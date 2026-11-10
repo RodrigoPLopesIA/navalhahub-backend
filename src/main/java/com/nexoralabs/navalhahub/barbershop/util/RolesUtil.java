@@ -1,6 +1,9 @@
 package com.nexoralabs.navalhahub.barbershop.util;
 
 import com.nexoralabs.navalhahub.barbershop.roles.BarbershopRole;
+
+import java.util.Set;
+
 import org.springframework.security.access.AccessDeniedException;
 
 public final class RolesUtil {
@@ -10,13 +13,6 @@ public final class RolesUtil {
             java.util.Set<BarbershopRole> currentRoles
     ) {
 
-        boolean isOwner = currentRoles.contains(
-                BarbershopRole.OWNER
-        );
-
-        boolean isAdmin = currentRoles.contains(
-                BarbershopRole.ADMIN
-        );
 
         if (requestedRole == BarbershopRole.OWNER) {
             throw new AccessDeniedException(
@@ -24,11 +20,21 @@ public final class RolesUtil {
             );
         }
 
-        if (isAdmin && !isOwner &&
+        if (isAdmin(currentRoles) && !isOwner(currentRoles) &&
                 requestedRole != BarbershopRole.BARBER) {
             throw new AccessDeniedException(
                     "ADMIN can only create BARBER users"
             );
         }
+    }
+
+    public static boolean isAdmin(Set<BarbershopRole> currentRoles) {
+        return currentRoles.contains(BarbershopRole.ADMIN);
+    }
+
+    public static boolean isOwner(Set<BarbershopRole> currentRoles){
+        return currentRoles.contains(
+                BarbershopRole.OWNER
+        );
     }
 }
