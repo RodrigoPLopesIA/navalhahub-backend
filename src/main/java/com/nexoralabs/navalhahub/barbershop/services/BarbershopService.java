@@ -3,95 +3,59 @@ package com.nexoralabs.navalhahub.barbershop.services;
 import com.nexoralabs.navalhahub.barbershop.dto.request.BarbershopRequest;
 import com.nexoralabs.navalhahub.barbershop.dto.response.BarbershopResponse;
 import com.nexoralabs.navalhahub.barbershop.entity.Barbershop;
+import com.nexoralabs.navalhahub.barbershop.entity.BarbershopMember;
 import com.nexoralabs.navalhahub.barbershop.mapper.BarbershopMapper;
+import com.nexoralabs.navalhahub.barbershop.repository.BarbershopMemberRepository;
 import com.nexoralabs.navalhahub.barbershop.repository.BarbershopRepository;
+import com.nexoralabs.navalhahub.barbershop.roles.BarbershopRole;
+import com.nexoralabs.navalhahub.security.context.TenantContextHolder;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 
 @Service
 @RequiredArgsConstructor
 public class BarbershopService {
 
-    private final BarbershopRepository repository;
-    private final BarbershopMapper mapper;
+    private final BarbershopRepository barbershopRepository;
+    private final BarbershopMemberRepository barbershopMemberRepository;
+    private final BarbershopMapper barbershopMapper;
 
     @Transactional
-    public BarbershopResponse create(BarbershopRequest request) {
-        if (repository.existsBySlug(request.getSlug())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Já existe uma barbearia com esse slug"
+    public BarbershopResponse save(BarbershopRequest request, String identityId) {
+
+        if (barbershopRepository
+                .findBarbershopByName(request.getName())
+                .isPresent()) {
+            throw new IllegalArgumentException(
+                    "Já existe uma barbearia com esse nome."
             );
         }
 
-        Barbershop barbershop = mapper.toEntity(request);
-        Barbershop saved = repository.save(barbershop);
 
-        return mapper.toResponse(saved);
-    }
+        Barbershop barbershop = barbershopMapper.toEntity(request);
 
-    @Transactional(readOnly = true)
-    public Page<BarbershopResponse> findAll(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toResponse);
+        Barbershop saved = barbershopRepository.save(barbershop);
 
-    }
+        BarbershopMember member = BarbershopMember.builder()
+                .barbershop(saved)
+                .identityID(identityId)
+                .roles(Set.of(BarbershopRole.OWNER))
+                .active(true)
+                .joinedAt(LocalDateTime.now())
+                .build();
 
-    @Transactional(readOnly = true)
-    public BarbershopResponse findById(String id) {
-        return mapper.toResponse(getBarbershopOrThrow(id));
-    }
+        barbershopMemberRepository.save(member);
 
-    @Transactional
-    public BarbershopResponse update(
-            String id,
-            BarbershopRequest request
-    ) {
-        Barbershop barbershop = getBarbershopOrThrow(id);
+        saved.setMembers(new ArrayList<>(List.of(member)));
 
-        repository.findBySlug(request.getSlug())
-                .filter(existing -> !existing.getId().equals(id))
-                .ifPresent(existing -> {
-                    throw new ResponseStatusException(
-                            HttpStatus.CONFLICT,
-                            "Já existe uma barbearia com esse slug"
-                    );
-                });
-
-        mapper.updateEntity(barbershop, request);
-
-        return mapper.toResponse(repository.save(barbershop));
-    }
-
-    @Transactional
-    public BarbershopResponse updateStatus(
-            String id,
-            boolean active
-    ) {
-        Barbershop barbershop = getBarbershopOrThrow(id);
-        barbershop.setActive(active);
-
-        return mapper.toResponse(repository.save(barbershop));
-    }
-
-    @Transactional
-    public void delete(String id) {
-        Barbershop barbershop = getBarbershopOrThrow(id);
-        repository.delete(barbershop);
-    }
-
-    private Barbershop getBarbershopOrThrow(String id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Barbearia não encontrada"
-                ));
+        return barbershopMapper.toResponse(saved);
     }
 }
 
