@@ -50,6 +50,10 @@ public class Barbershop {
     @Embedded
     private Address address;
 
+    @OneToMany(mappedBy = "barbershop", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<BarbershopMember> members = new ArrayList<>();
+
     @Column(nullable = false)
     @Builder.Default
     private boolean active = true;

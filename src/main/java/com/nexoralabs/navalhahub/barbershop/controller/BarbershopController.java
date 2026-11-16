@@ -4,72 +4,30 @@ package com.nexoralabs.navalhahub.barbershop.controller;
 import com.nexoralabs.navalhahub.barbershop.dto.request.BarbershopRequest;
 import com.nexoralabs.navalhahub.barbershop.dto.response.BarbershopResponse;
 import com.nexoralabs.navalhahub.barbershop.services.BarbershopService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.util.List;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
-@RequestMapping("/api/barbershops")
+@RequestMapping("api/barbershops")
 @RequiredArgsConstructor
 public class BarbershopController {
 
-    private final BarbershopService service;
 
+    private final BarbershopService barbershopService;
     @PostMapping
-    public ResponseEntity<BarbershopResponse> create(
-            @Valid @RequestBody BarbershopRequest request
-    ) {
-        BarbershopResponse response = service.create(request);
+    public ResponseEntity<BarbershopResponse> save(@RequestBody BarbershopRequest barbershop, @AuthenticationPrincipal Jwt jwt) {
 
-        URI location = URI.create(
-                "/api/barbershops/" + response.getId()
-        );
-
-        return ResponseEntity.created(location).body(response);
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<BarbershopResponse>> findAll(Pageable pageable) {
-        return ResponseEntity.ok(service.findAll(pageable));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<BarbershopResponse> findById(
-            @PathVariable String id
-    ) {
-        return ResponseEntity.ok(service.findById(id));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<BarbershopResponse> update(
-            @PathVariable String id,
-            @Valid @RequestBody BarbershopRequest request
-    ) {
-        return ResponseEntity.ok(service.update(id, request));
-    }
-
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<BarbershopResponse> updateStatus(
-            @PathVariable String id,
-            @RequestParam boolean active
-    ) {
-        return ResponseEntity.ok(
-                service.updateStatus(id, active)
-        );
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @PathVariable String id
-    ) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
+        String identityId = jwt.getClaimAsString("identityId");
+        var response = this.barbershopService.save(barbershop, identityId);
+        var uri = UriComponentsBuilder.fromUriString("/api/barbershops/{id}").buildAndExpand(response.getId()).toUri();
+        return ResponseEntity.created(uri).body(response);
     }
 }
-
