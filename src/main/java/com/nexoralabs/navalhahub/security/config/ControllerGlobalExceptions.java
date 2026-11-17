@@ -134,18 +134,18 @@ public class ControllerGlobalExceptions {
         }
 
         // 500 - Erros inesperados
-        @ExceptionHandler(Exception.class)
-        public ResponseEntity<ErrorResponseDTO> handleGeneric(
-                        Exception ex,
-                        HttpServletRequest request) {
-                // Registrar o erro completo no log do servidor.
-                // Não retornar stack trace ao cliente.
-
-                return buildResponse(
-                                HttpStatus.INTERNAL_SERVER_ERROR,
-                                "Ocorreu um erro interno inesperado.",
-                                request);
-        }
+//        @ExceptionHandler(Exception.class)
+//        public ResponseEntity<ErrorResponseDTO> handleGeneric(
+//                        Exception ex,
+//                        HttpServletRequest request) {
+//                // Registrar o erro completo no log do servidor.
+//                // Não retornar stack trace ao cliente.
+//
+//                return buildResponse(
+//                                HttpStatus.INTERNAL_SERVER_ERROR,
+//                                "Ocorreu um erro interno inesperado.",
+//                                request);
+//        }
 
         @ExceptionHandler(WebApplicationException.class)
         public ResponseEntity<ErrorResponseDTO> handleKeycloakError(
