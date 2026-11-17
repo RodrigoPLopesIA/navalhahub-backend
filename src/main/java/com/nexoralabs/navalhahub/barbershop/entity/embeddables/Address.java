@@ -50,6 +50,7 @@ public class Address {
     @NotBlank
     @Size(max = 100)
     @Column(name = "country", nullable = false, length = 100)
+    @Builder.Default
     private String country = "Brasil";
 
 }

@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface BarbershopRepository extends JpaRepository<Barbershop, String> {
 
     Optional<Barbershop> findBarbershopByName(String barbershopName);
+
+
 }
