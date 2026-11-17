@@ -65,4 +65,21 @@ public interface BarbershopMemberRepository
             Collection<BarbershopRole> restrictedRoles,
             Pageable pageable
     );
+
+    @Query(
+            value = """
+        select m from BarbershopMember m
+        join fetch m.barbershop
+        where m.identityID = :identityId and m.active = true
+        """,
+            countQuery = """
+        select count(m) from BarbershopMember m
+        where m.identityID = :identityId and m.active = true
+        """
+    )
+    Page<BarbershopMember> findActiveByIdentityId(
+            @Param("identityId") String identityId,
+            Pageable pageable);
+
+    void deleteAllByBarbershop_Id(String barbershopId);
 }
