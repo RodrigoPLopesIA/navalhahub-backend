@@ -6,9 +6,9 @@ import com.nexoralabs.navalhahub.barbershop.entity.embeddables.PhoneNumber;
 import com.nexoralabs.navalhahub.barbershop.repository.BarbershopCustomerRepository;
 import com.nexoralabs.navalhahub.barbershop.repository.BarbershopMemberRepository;
 import com.nexoralabs.navalhahub.barbershop.repository.BarbershopRepository;
+import com.nexoralabs.navalhahub.customer.dto.CustomerResponse;
+import com.nexoralabs.navalhahub.customer.dto.UpdateCustomerRequest;
 import com.nexoralabs.navalhahub.customer.dto.request.CreateCustomerRequest;
-import com.nexoralabs.navalhahub.customer.dto.request.UpdateCustomerRequest;
-import com.nexoralabs.navalhahub.customer.dto.response.CustomerResponse;
 import com.nexoralabs.navalhahub.customer.entity.Customer;
 import com.nexoralabs.navalhahub.customer.mapper.CustomerMapper;
 import com.nexoralabs.navalhahub.customer.repository.CustomerRepository;
@@ -145,13 +145,13 @@ public class CustomerService {
 
     /** Autorização multi-tenant: o usuário precisa pertencer à barbearia. Sempre roda antes de qualquer leitura. */
     private void assertMember(String identityId, UUID barbershopId) {
-        if (!barbershopMemberRepository.existsByBarbershopIdAndUser_IdentityId(barbershopId, identityId)) {
+        if (!barbershopMemberRepository.existsByBarbershop_IdAndIdentityID(barbershopId.toString(), identityId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem acesso a esta barbearia");
         }
     }
 
     private Barbershop getBarbershop(UUID barbershopId) {
-        return barbershopRepository.findById(barbershopId)
+        return barbershopRepository.findById(barbershopId.toString())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Barbearia não encontrada"));
     }
 

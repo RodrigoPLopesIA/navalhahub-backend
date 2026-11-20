@@ -15,5 +15,7 @@ public record PhoneNumberDto(
         @NotBlank(message = "O número é obrigatório")
         @Pattern(regexp = "^(?=(?:\\D*\\d){8,15}\\D*$)[\\d\\s()\\-]+$",
                 message = "Número inválido (de 8 a 15 dígitos)")
-        String number
+        String number,
+
+        String type
 ) {}

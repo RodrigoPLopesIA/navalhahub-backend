@@ -3,6 +3,8 @@ package com.nexoralabs.navalhahub.customer.mapper;
 import com.nexoralabs.navalhahub.barbershop.entity.BarbershopCustomer;
 import com.nexoralabs.navalhahub.barbershop.entity.embeddables.PhoneNumber;
 
+import com.nexoralabs.navalhahub.customer.dto.CustomerResponse;
+import com.nexoralabs.navalhahub.customer.dto.PhoneNumberDto;
 import com.nexoralabs.navalhahub.customer.entity.Customer;
 import org.springframework.stereotype.Component;
 
@@ -26,11 +28,11 @@ public class CustomerMapper {
     // Premissa: PhoneNumber tem os campos countryCode e number e um construtor (countryCode, number).
 
     public PhoneNumber toEntity(PhoneNumberDto dto) {
-        return new PhoneNumber(digits(dto.countryCode()), digits(dto.number()));
+        return new PhoneNumber(digits(dto.countryCode()), dto.type(), digits(dto.number()));
     }
 
     public PhoneNumberDto toDto(PhoneNumber phone) {
-        return phone == null ? null : new PhoneNumberDto(phone.getCountryCode(), phone.getNumber());
+        return phone == null ? null : new PhoneNumberDto(phone.getCountryCode(), phone.getType(), phone.getNumber());
     }
 
     private String displayName(BarbershopCustomer link) {

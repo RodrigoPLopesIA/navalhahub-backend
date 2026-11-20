@@ -84,5 +84,8 @@ public interface BarbershopMemberRepository
 
     void deleteAllByBarbershop_Id(String barbershopId);
 
-    boolean existsByBarbershopIdAndUser_IdentityId(UUID barbershopId, String identityId);
+    boolean existsByBarbershop_IdAndIdentityID(
+            String barbershopId,
+            String identityID
+    );
 }
