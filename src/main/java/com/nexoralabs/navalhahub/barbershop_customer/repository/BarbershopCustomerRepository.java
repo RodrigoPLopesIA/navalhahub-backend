@@ -1,4 +1,4 @@
-package com.nexoralabs.navalhahub.barbershop.repository;
+package com.nexoralabs.navalhahub.barbershop_customer.repository;
 
 import com.nexoralabs.navalhahub.barbershop.entity.BarbershopCustomer;
 import org.springframework.data.domain.Page;
