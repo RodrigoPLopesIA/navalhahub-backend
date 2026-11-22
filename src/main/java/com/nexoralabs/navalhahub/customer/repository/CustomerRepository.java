@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     Optional<Customer> findByPhoneNumberCountryCodeAndPhoneNumberNumber(String countryCode, String number);
+
+    Optional<Customer> findByIdAndActiveTrue(UUID id);
 }

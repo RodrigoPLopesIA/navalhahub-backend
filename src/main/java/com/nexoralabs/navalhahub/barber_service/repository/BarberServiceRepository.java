@@ -28,8 +28,6 @@ public interface BarberServiceRepository
             String memberId
     );
 
-    boolean existsByService_IdAndBarbershopMember_Id(
-            UUID serviceId,
-            String memberId
-    );
+
+    Optional<BarberService> findByBarbershopMember_IdAndService_IdAndActiveTrue(String barbershopmemberId, UUID serviceId);
 }

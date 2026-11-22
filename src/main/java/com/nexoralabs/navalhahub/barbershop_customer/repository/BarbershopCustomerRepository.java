@@ -56,4 +56,9 @@ public interface BarbershopCustomerRepository extends JpaRepository<BarbershopCu
                                              @Param("term") String term,
                                              @Param("blocked") boolean blocked,
                                              Pageable pageable);
+    Optional<BarbershopCustomer>
+    findByBarbershop_IdAndCustomer_IdAndActiveTrue(
+            String barbershopId,
+            UUID customerId
+    );
 }
