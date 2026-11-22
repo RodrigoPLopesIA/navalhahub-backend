@@ -48,6 +48,7 @@ public class BarberAvailabilityService {
         );
 
         BarberAvailability availability = availabilityMapper.toEntity(request);
+        availability.setBarbershopMember(member);
         return availabilityMapper.toResponse(availabilityRepository.save(availability));
     }
 

@@ -46,6 +46,7 @@ public class BarberAvailability {
     private LocalTime endTime;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean active = true;
 
     @CreatedDate
