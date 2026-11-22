@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface BarbershopMemberRepository
         extends JpaRepository<BarbershopMember, String> {
@@ -82,4 +83,9 @@ public interface BarbershopMemberRepository
             Pageable pageable);
 
     void deleteAllByBarbershop_Id(String barbershopId);
+
+    boolean existsByBarbershop_IdAndIdentityID(
+            String barbershopId,
+            String identityID
+    );
 }
