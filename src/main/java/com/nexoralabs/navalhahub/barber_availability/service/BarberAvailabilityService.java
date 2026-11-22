@@ -6,7 +6,7 @@ import com.nexoralabs.navalhahub.barber_availability.entity.BarberAvailability;
 import com.nexoralabs.navalhahub.barber_availability.mapper.BarberAvailabilityMapper;
 import com.nexoralabs.navalhahub.barber_availability.repository.BarberAvailabilityRepository;
 import com.nexoralabs.navalhahub.barbershop.entity.BarbershopMember;
-import com.nexoralabs.navalhahub.barbershop.repository.BarbershopMemberRepository;
+import com.nexoralabs.navalhahub.barbershop_member.repository.BarbershopMemberRepository;
 import com.nexoralabs.navalhahub.barbershop.roles.BarbershopRole;
 import com.nexoralabs.navalhahub.security.context.TenantContextHolder;
 

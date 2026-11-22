@@ -5,7 +5,7 @@ import com.nexoralabs.navalhahub.User.dto.UserRequest;
 import com.nexoralabs.navalhahub.User.dto.UserResponse;
 import com.nexoralabs.navalhahub.barbershop.entity.Barbershop;
 import com.nexoralabs.navalhahub.barbershop.entity.BarbershopMember;
-import com.nexoralabs.navalhahub.barbershop.repository.BarbershopMemberRepository;
+import com.nexoralabs.navalhahub.barbershop_member.repository.BarbershopMemberRepository;
 import com.nexoralabs.navalhahub.barbershop.repository.BarbershopRepository;
 import com.nexoralabs.navalhahub.barbershop.roles.BarbershopRole;
 import com.nexoralabs.navalhahub.barbershop.util.RolesUtil;
