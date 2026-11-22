@@ -12,6 +12,7 @@ import com.nexoralabs.navalhahub.customer.dto.request.CreateCustomerRequest;
 import com.nexoralabs.navalhahub.customer.entity.Customer;
 import com.nexoralabs.navalhahub.customer.mapper.CustomerMapper;
 import com.nexoralabs.navalhahub.customer.repository.CustomerRepository;
+import com.nexoralabs.navalhahub.security.context.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -40,9 +41,10 @@ public class CustomerService {
      * se já existir, reaproveita e apenas cria o vínculo. O cadastro global nunca é sobrescrito.
      */
     @Transactional
-    public CustomerResponse create(String identityId, UUID barbershopId, CreateCustomerRequest request) {
-        assertMember(identityId, barbershopId);
-        Barbershop barbershop = getBarbershop(barbershopId);
+    public CustomerResponse create(String barbershopId, CreateCustomerRequest request) {
+        var context = TenantContextHolder.get();
+        assertMember(context.identityId(),  UUID.fromString(barbershopId));
+        Barbershop barbershop = getBarbershop( UUID.fromString(barbershopId));
 
         PhoneNumber phone = mapper.toEntity(request.phoneNumber());
 
@@ -53,7 +55,7 @@ public class CustomerService {
         if (!customer.isActive()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Este cliente não pode ser cadastrado");
         }
-        if (barbershopCustomerRepository.existsByBarbershopIdAndCustomerId(barbershopId, customer.getId())) {
+        if (barbershopCustomerRepository.existsByBarbershopIdAndCustomerId(UUID.fromString(barbershopId), customer.getId())) {
             throw alreadyRegistered();
         }
 
