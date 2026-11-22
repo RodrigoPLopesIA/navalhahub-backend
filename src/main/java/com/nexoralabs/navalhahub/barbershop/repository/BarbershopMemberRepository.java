@@ -88,4 +88,10 @@ public interface BarbershopMemberRepository
             String barbershopId,
             String identityID
     );
+
+    Optional<BarbershopMember>
+    findByBarbershop_IdAndIdentityID(
+            String barbershopId,
+            String identityID
+    );
 }
