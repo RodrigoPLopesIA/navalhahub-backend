@@ -32,11 +32,6 @@ public interface BarbershopServicesRepository
             UUID id
     );
 
-    Optional<BarbershopServices>
-    findByBarbershopMember_IdAndService_IdAndActiveTrue(
-            String memberId,
-            UUID serviceId
-    );
 
     Optional<BarbershopServices> findByIdAndBarbershop_IdAndActiveTrue(UUID serviceId, String barbershopId);
 }
