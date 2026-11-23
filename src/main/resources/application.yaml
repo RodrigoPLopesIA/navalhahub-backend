@@ -39,4 +39,4 @@ keycloak:
     base-url: ${KEYCLOAK_ADMIN_URL:http://localhost:8080}
     realm: navalha-hub-realm
     client-id: navalha-hub-client-admin
-    client-secret: yKCQD7H5DY2MY1MXob7jvJx4s9L3ZOHU
+    client-secret: diaNhtoaKbT4vByrNDu9PJylqUHH1HZT
