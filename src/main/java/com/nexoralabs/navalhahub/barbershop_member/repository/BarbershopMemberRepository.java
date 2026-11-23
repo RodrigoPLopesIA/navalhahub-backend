@@ -1,4 +1,4 @@
-package com.nexoralabs.navalhahub.barbershop.repository;
+package com.nexoralabs.navalhahub.barbershop_member.repository;
 
 import com.nexoralabs.navalhahub.barbershop.entity.BarbershopMember;
 import com.nexoralabs.navalhahub.barbershop.roles.BarbershopRole;
@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 public interface BarbershopMemberRepository
@@ -82,4 +81,15 @@ public interface BarbershopMemberRepository
             Pageable pageable);
 
     void deleteAllByBarbershop_Id(String barbershopId);
+
+    boolean existsByBarbershop_IdAndIdentityID(
+            String barbershopId,
+            String identityID
+    );
+
+    Optional<BarbershopMember>
+    findByBarbershop_IdAndIdentityID(
+            String barbershopId,
+            String identityID
+    );
 }

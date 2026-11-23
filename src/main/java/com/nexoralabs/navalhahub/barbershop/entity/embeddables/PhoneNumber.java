@@ -16,4 +16,5 @@ public class PhoneNumber {
     @Column(nullable = false, length = 20)
     private String number;
     private String type;
+    private String countryCode;
 }

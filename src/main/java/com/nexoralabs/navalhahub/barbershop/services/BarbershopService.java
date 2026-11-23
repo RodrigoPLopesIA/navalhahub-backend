@@ -5,7 +5,7 @@ import com.nexoralabs.navalhahub.barbershop.dto.response.BarbershopResponse;
 import com.nexoralabs.navalhahub.barbershop.entity.Barbershop;
 import com.nexoralabs.navalhahub.barbershop.entity.BarbershopMember;
 import com.nexoralabs.navalhahub.barbershop.mapper.BarbershopMapper;
-import com.nexoralabs.navalhahub.barbershop.repository.BarbershopMemberRepository;
+import com.nexoralabs.navalhahub.barbershop_member.repository.BarbershopMemberRepository;
 import com.nexoralabs.navalhahub.barbershop.repository.BarbershopRepository;
 import com.nexoralabs.navalhahub.barbershop.roles.BarbershopRole;
 import com.nexoralabs.navalhahub.barbershop.util.RolesUtil;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Service

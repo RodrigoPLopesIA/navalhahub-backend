@@ -9,7 +9,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import com.nexoralabs.navalhahub.barbershop.repository.BarbershopMemberRepository;
 import com.nexoralabs.navalhahub.security.context.TenantContext;
 import com.nexoralabs.navalhahub.security.context.TenantContextHolder;
 import lombok.RequiredArgsConstructor;

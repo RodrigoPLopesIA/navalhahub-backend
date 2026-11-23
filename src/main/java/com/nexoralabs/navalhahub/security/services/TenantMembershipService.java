@@ -1,6 +1,6 @@
 package com.nexoralabs.navalhahub.security.services;
 
-import com.nexoralabs.navalhahub.barbershop.repository.BarbershopMemberRepository;
+import com.nexoralabs.navalhahub.barbershop_member.repository.BarbershopMemberRepository;
 import com.nexoralabs.navalhahub.security.context.TenantContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
