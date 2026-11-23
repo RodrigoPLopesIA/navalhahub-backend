@@ -57,7 +57,7 @@ public interface BarbershopCustomerRepository extends JpaRepository<BarbershopCu
                                              @Param("blocked") boolean blocked,
                                              Pageable pageable);
     Optional<BarbershopCustomer>
-    findByBarbershop_IdAndCustomer_IdAndActiveTrue(
+    findByBarbershop_IdAndCustomer_IdAndBlockedFalse(
             String barbershopId,
             UUID customerId
     );

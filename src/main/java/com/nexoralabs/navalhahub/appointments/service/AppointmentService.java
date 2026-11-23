@@ -86,7 +86,7 @@ public class AppointmentService {
                 );
 
         barbershopCustomerRepository
-                .findByBarbershop_IdAndCustomer_IdAndActiveTrue(
+                .findByBarbershop_IdAndCustomer_IdAndBlockedFalse(
                         barbershopId,
                         customer.getId()
                 )
